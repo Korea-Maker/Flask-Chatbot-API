@@ -72,4 +72,7 @@ def chat():
         return jsonify({"error": "No response from assistant"}), 500
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port='5000', debug=True)
+    app.run(host='127.0.0.1', port='5050', debug=True)
+
+
+# 쓰레드 값이 비어있을 경우 새로운 쓰레드를 생성하고, 쓰레드에 메시지를 추가하는 방식으로 진행
