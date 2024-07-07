@@ -49,7 +49,7 @@ def chat():
     )
     run = create_run(thread.id, ASSISTANT_ID)
 
-    run_poll = poll_run(run, thread)
+    poll_run(run, thread)
 
     messages = client.beta.threads.messages.list(
         thread_id=thread.id
