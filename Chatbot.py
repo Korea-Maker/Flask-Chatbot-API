@@ -1,5 +1,5 @@
 import openai
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 import os
 import time
 import re
@@ -11,13 +11,13 @@ CORS(app)
 
 # Linux 환경에서 .env 파일을 사용하기 위해 아래 코드를 추가
 # Load .env
-# load_dotenv()
-# API_KEY = os.environ.get('API_KEY')  # .env 파일에 저장된 API_KEY를 가져옴
-# ASSISTANT_ID = os.environ.get('ASSISTANT_ID')  # .env 파일에 저장된 Assistant ID를 가져옴
+load_dotenv()
+API_KEY = os.environ.get('API_KEY')  # .env 파일에 저장된 API_KEY를 가져옴
+ASSISTANT_ID = os.environ.get('ASSISTANT_ID')  # .env 파일에 저장된 Assistant ID를 가져옴
 
-# Windows 환경에서 .env 파일을 사용하기 위해 아래 코드를 추가
-API_KEY = os.getenv('API_KEY')  # .env 파일에 저장된 API_KEY를 가져옴
-ASSISTANT_ID = os.getenv('ASSISTANT_ID')  # .env 파일에 저장된 Assistant ID를 가져옴
+# # Windows 환경에서 .env 파일을 사용하기 위해 아래 코드를 추가
+# API_KEY = os.getenv('API_KEY')  # .env 파일에 저장된 API_KEY를 가져옴
+# ASSISTANT_ID = os.getenv('ASSISTANT_ID')  # .env 파일에 저장된 Assistant ID를 가져옴
 
 client = openai.OpenAI(api_key=API_KEY)  # API_KEY를 사용하여 OpenAI 클라이언트를 생성
 
