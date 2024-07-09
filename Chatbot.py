@@ -1,5 +1,5 @@
 import openai
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import os
 import time
 import re
@@ -9,11 +9,15 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# Linux 환경에서 .env 파일을 사용하기 위해 아래 코드를 추가
 # Load .env
-load_dotenv()
+# load_dotenv()
+# API_KEY = os.environ.get('API_KEY')  # .env 파일에 저장된 API_KEY를 가져옴
+# ASSISTANT_ID = os.environ.get('ASSISTANT_ID')  # .env 파일에 저장된 Assistant ID를 가져옴
 
-API_KEY = os.environ.get('API_KEY')  # .env 파일에 저장된 API_KEY를 가져옴
-ASSISTANT_ID = os.environ.get('ASSISTANT_ID')  # .env 파일에 저장된 Assistant ID를 가져옴
+# Windows 환경에서 .env 파일을 사용하기 위해 아래 코드를 추가
+API_KEY = os.getenv('API_KEY')  # .env 파일에 저장된 API_KEY를 가져옴
+ASSISTANT_ID = os.getenv('ASSISTANT_ID')  # .env 파일에 저장된 Assistant ID를 가져옴
 
 client = openai.OpenAI(api_key=API_KEY)  # API_KEY를 사용하여 OpenAI 클라이언트를 생성
 
@@ -37,12 +41,15 @@ def create_run(thread_id, assistant_id):
 def chat():
     data = request.get_json()
     user_message = data['question']
+    thread_id = data.get('thread_id', None) # thread_id 값이 없을 경우 None으로 초기화
 
     if not user_message:
         return jsonify({"error": "Not Message"}), 400
 
-    # Thread 생성
-    thread = client.beta.threads.create()
+    if thread_id != None:
+        thread = client.beta.threads.retrieve(thread_id) # thread_id 값이 있을 경우 해당 thread_id를 사용하여 쓰레드를 가져옴
+    else:
+        thread = client.beta.threads.create() # thread_id 값이 없을 경우 새로운 쓰레드를 생성
 
     message = client.beta.threads.messages.create(
         thread_id=thread.id,
