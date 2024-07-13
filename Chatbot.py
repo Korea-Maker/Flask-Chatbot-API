@@ -1,5 +1,5 @@
 import openai
-from dotenv import load_dotenv
+from dotenv import load_dotenv # 윈도우 사용 시 주석 처리
 import os
 import time
 import re
@@ -84,4 +84,6 @@ if __name__ == '__main__':
     app.run(host='127.0.0.1', port='5050', debug=True)
 
 
-# 쓰레드 값이 비어있을 경우 새로운 쓰레드를 생성하고, 쓰레드에 메시지를 추가하는 방식으로 진행
+# 현재 응답에 thread_id를 함께 반환하여 다음 대화에서 thread_id를 사용하여 이전 대화 내용을 기억하고 이어서 진행할 수 있도록 함
+# 그러나 지속적으로 thread_id를 반환하기 때문에 응답 내용이 많아질 수 있음
+# 이후 요청 내 thread_id를 포함하여 요청할 경우 응답에 thread_id를 반환하지 않도록 수정할 예정
