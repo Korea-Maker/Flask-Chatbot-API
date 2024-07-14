@@ -46,7 +46,7 @@ def chat():
     if not user_message:
         return jsonify({"error": "Not Message"}), 400
 
-    if thread_id != None:
+    if thread_id:
         thread = client.beta.threads.retrieve(thread_id) # thread_id 값이 있을 경우 해당 thread_id를 사용하여 쓰레드를 가져옴
     else:
         thread = client.beta.threads.create() # thread_id 값이 없을 경우 새로운 쓰레드를 생성
