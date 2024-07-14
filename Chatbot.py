@@ -46,7 +46,7 @@ def chat():
     if not user_message:
         return jsonify({"error": "Not Message"}), 400
 
-    if thread_id:
+    if thread_id != None:
         thread = client.beta.threads.retrieve(thread_id) # thread_id 값이 있을 경우 해당 thread_id를 사용하여 쓰레드를 가져옴
     else:
         thread = client.beta.threads.create() # thread_id 값이 없을 경우 새로운 쓰레드를 생성
@@ -66,8 +66,6 @@ def chat():
 
     messages_list = list(messages) # 가장 최근의 assistant 메시지를 찾기 위해 메시지를 리스트로 변환 인덱스 [0]이 항상 최신 메시지
 
-    # 가장 최근의 assistant 메시지만 출력 / 현재는 이전에 사용하던 thread_id 값을 가져와 사용하지 않아 이전 대화 내용을 기억하지 않으나,
-    # 이후 사용자가 이전 대화 내용을 기억하고 이어서 진행할 수 있도록 thread_id 값을 저장하여 사용할 수 있음
     last_message = None
     for message in messages_list:
         if message.role == "assistant":
