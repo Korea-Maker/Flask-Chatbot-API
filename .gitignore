@@ -3,3 +3,4 @@ my-resume.txt
 chatbot_test.py
 /__pycache__/
 Chatbot_fastapi.py
+test_chatbot.py

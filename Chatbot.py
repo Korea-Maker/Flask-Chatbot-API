@@ -6,6 +6,7 @@ import re
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
+import datetime
 
 # Load .env
 load_dotenv()
@@ -33,7 +34,7 @@ def poll_run(run, thread):
             )
             time.sleep(0.5)
     except Exception as e:
-        print(f"Error polling run status: {e}")
+        print(f"Error polling run status: {e}") # 실행 상태를 폴링하는 동안 오류가 발생했습니다.
         return None
     return run
 
@@ -45,9 +46,21 @@ def create_run(thread_id, assistant_id):
             assistant_id=assistant_id,
         )
     except Exception as e:
-        print(f"Error creating run: {e}")
+        print(f"Error creating run: {e}") # 실행을 만드는 동안 오류가 발생했습니다.
         return None
     return run
+
+def mongo_find_ip(ip):
+    try:
+        last_1_hour = datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=1)
+        responses = mongo.db.responses.find({"client_ip": ip, "_time": {"$gte": last_1_hour}})
+        response_list = []
+        for response in responses:
+            response_list.append(response)
+        return len(response_list)
+    except Exception as e:
+        print(f"Error finding responses in MongoDB: {e}") # MongoDB에서 응답을 찾는 동안 오류가 발생했습니다.
+        return None
 
 
 @app.route('/chat', methods=['POST'])
@@ -55,16 +68,19 @@ def chat():
     try:
         data = request.get_json()
         user_message = data['question']
-        thread_id = data.get('thread_id', None)  # thread_id 값이 없을 경우 None으로 초기화
+        thread_id = data.get('thread_id', None)
         client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        
+        if mongo_find_ip(client_ip) >= 5:
+            return jsonify({"response": "You have reached the maximum number of requests"}), 429
 
         if not user_message:
-            return jsonify({"error": "No message provided"}), 400
+            return jsonify({"error": "No message provided"}), 400 # 메시지가 제공되지 않았습니다.
 
         if thread_id is not None:
-            thread = client.beta.threads.retrieve(thread_id)  # thread_id 값이 있을 경우 해당 thread_id를 사용하여 쓰레드를 가져옴
+            thread = client.beta.threads.retrieve(thread_id)
         else:
-            thread = client.beta.threads.create()  # thread_id 값이 없을 경우 새로운 쓰레드를 생성
+            thread = client.beta.threads.create()
 
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
@@ -74,12 +90,12 @@ def chat():
         run = create_run(thread.id, ASSISTANT_ID)
 
         if run is None:
-            return jsonify({"error": "Failed to create run"}), 500
+            return jsonify({"error": "Failed to create run"}), 500 # 실행을 만드는 데 실패했습니다.
 
         run = poll_run(run, thread)
 
         if run is None:
-            return jsonify({"error": "Error while polling run status"}), 500
+            return jsonify({"error": "Error while polling run status"}), 500 # 실행 상태를 폴링하는 동안 오류가 발생했습니다.
 
         messages = client.beta.threads.messages.list(
             thread_id=thread.id
@@ -96,25 +112,27 @@ def chat():
         if last_message:
             response_content = re.sub(r'【\d+:\d+†source】', '', last_message.content[0].text.value)  # Assistant의 답변에서 source를 제거
             data = {
+                "time": datetime.datetime.now(datetime.UTC),
                 "client_ip": client_ip,
                 "question": user_message,
                 "response": response_content
             }
             try:
                 mongo.db.responses.insert_one({
+                    "_time": data["time"],
                     "client_ip": data['client_ip'],
                     "user_message": data['question'],
                     "assistant_message": data['response'],
                 })
             except Exception as e:
                 print(f"Error inserting document to MongoDB: {e}")
-                return jsonify({"error": "Failed to save response to database"}), 500
+                return jsonify({"error": "Failed to save response to database"}), 500 # 데이터베이스에 응답을 저장하는 데 실패했습니다.
             return jsonify({"response": response_content, "thread_id": thread.id})
         else:
-            return jsonify({"error": "No response from assistant"}), 500
+            return jsonify({"error": "No response from assistant"}), 500 # Assistant로부터 응답이 없습니다.
     except Exception as e:
-        print(f"General error in /chat endpoint: {e}")
-        return jsonify({"error": "An unexpected error occurred"}), 500
+        print(f"General error in /chat endpoint: {e}") # /chat 엔드포인트의 일반적인 오류
+        return jsonify({"error": "An unexpected error occurred"}), 500 # 예기치 않은 오류가 발생했습니다.
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port='5050', debug=True)
