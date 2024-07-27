@@ -34,7 +34,7 @@ def poll_run(run, thread):
             )
             time.sleep(0.5)
     except Exception as e:
-        print(f"Error polling run status: {e}") # 실행 상태를 폴링하는 동안 오류가 발생했습니다.
+        print(f"실행 상태를 폴링하는 동안 오류가 발생했습니다. {e}") # 실행 상태를 폴링하는 동안 오류가 발생했습니다.
         return None
     return run
 
@@ -46,7 +46,7 @@ def create_run(thread_id, assistant_id):
             assistant_id=assistant_id,
         )
     except Exception as e:
-        print(f"Error creating run: {e}") # 실행을 만드는 동안 오류가 발생했습니다.
+        print(f"실행을 만드는 동안 오류가 발생했습니다. {e}") # 실행을 만드는 동안 오류가 발생했습니다.
         return None
     return run
 
@@ -59,7 +59,7 @@ def mongo_find_ip(ip):
             response_list.append(response)
         return len(response_list)
     except Exception as e:
-        print(f"Error finding responses in MongoDB: {e}") # MongoDB에서 응답을 찾는 동안 오류가 발생했습니다.
+        print(f"Mongodb에서 IP를 찾는 동안 오류가 발생했습니다. {e}")
         return None
 
 
@@ -72,10 +72,10 @@ def chat():
         client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         
         if mongo_find_ip(client_ip) >= 5:
-            return jsonify({"response": "You have reached the maximum number of requests"}), 429
+            return jsonify({"response": "시간당 최대 5회 질문이 가능합니다. 잠시후 다시 시도 바랍니다."}), 429
 
         if not user_message:
-            return jsonify({"error": "No message provided"}), 400 # 메시지가 제공되지 않았습니다.
+            return jsonify({"response": "메시지가 입력되지 않았습니다."}), 400
 
         if thread_id is not None:
             thread = client.beta.threads.retrieve(thread_id)
@@ -90,12 +90,12 @@ def chat():
         run = create_run(thread.id, ASSISTANT_ID)
 
         if run is None:
-            return jsonify({"error": "Failed to create run"}), 500 # 실행을 만드는 데 실패했습니다.
+            return jsonify({"response": "응답을 생성하는데 실패했습니다. project5587@gmail.com 으로 문의주세요."}), 500
 
         run = poll_run(run, thread)
 
         if run is None:
-            return jsonify({"error": "Error while polling run status"}), 500 # 실행 상태를 폴링하는 동안 오류가 발생했습니다.
+            return jsonify({"response": "응답을 생성했으나, 응답을 가져오는데 실패했습니다. project5587@gmail.com 으로 문의주세요."}), 500
 
         messages = client.beta.threads.messages.list(
             thread_id=thread.id
@@ -125,14 +125,14 @@ def chat():
                     "assistant_message": data['response'],
                 })
             except Exception as e:
-                print(f"Error inserting document to MongoDB: {e}")
-                return jsonify({"error": "Failed to save response to database"}), 500 # 데이터베이스에 응답을 저장하는 데 실패했습니다.
+                print(f"Mongodb에 응답을 저장하는데 실패했습니다. {e}")
+                return jsonify({"response": "데이터베이스에 응답을 저장하는데 실패했습니다. project5587@gmail.com 로 문의바랍니다."}), 500
             return jsonify({"response": response_content, "thread_id": thread.id})
         else:
-            return jsonify({"error": "No response from assistant"}), 500 # Assistant로부터 응답이 없습니다.
+            return jsonify({"response": "Assistant로부터 응답이 없습니다. 잠시후 다시 시도해주세요."}), 500
     except Exception as e:
-        print(f"General error in /chat endpoint: {e}") # /chat 엔드포인트의 일반적인 오류
-        return jsonify({"error": "An unexpected error occurred"}), 500 # 예기치 않은 오류가 발생했습니다.
+        print(f"엔드포인트에서 예기치 않은 오류가 발생했습니다. {e}")
+        return jsonify({"response": "예기치 않은 오류가 발생했습니다."}), 500
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port='5050', debug=True)
