@@ -40,6 +40,17 @@ jobs:
         # Snyk can be used to break the build when it detects security issues.
         # In this case we want to upload the SAST issues to GitHub Code Scanning
         uses: snyk/actions/setup@806182742461562b67788a64410098c9d9b96adb
+        
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12
+    
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
 
         # For Snyk Open Source you must first set up the development environment for your application's dependencies
         # For example for Node
