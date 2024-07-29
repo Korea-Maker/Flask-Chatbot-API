@@ -132,7 +132,7 @@ def chat():
             return jsonify({"response": "Assistant로부터 응답이 없습니다. 잠시후 다시 시도해주세요."}), 500
     except Exception as e:
         print(f"엔드포인트에서 예기치 않은 오류가 발생했습니다. {e}")
-        return jsonify({"response": "예기치 않은 오류가 발생했습니다."}), 500
+        return jsonify({"response": "예기치 않은 오류가 발생했습니다."}), 500ttttt
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port='5050')
