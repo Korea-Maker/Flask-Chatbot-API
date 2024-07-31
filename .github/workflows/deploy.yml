@@ -17,11 +17,8 @@ jobs:
               run: |
                 echo "AWS_DEFAULT_REGION=ap-northeast-2" >> $GITHUB_ENV
                 echo "AWS_SG_NAME=Resume_AIChatBot_Backend_SG" >> $GITHUB_ENV
-                echo "AWS_VPC_ID=04d952a98e42dfa35" >> $GITHUB_ENV
             
             - name: Configure AWS Credentials
-            # You may pin to the exact commit or the version.
-            # uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
               uses: aws-actions/configure-aws-credentials@v4
               with:
                 aws-region: ap-northeast-2
@@ -30,7 +27,7 @@ jobs:
             
             - name: Add Github Actions IP to Security Group
               run: |
-                aws ec2 authorize-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32 --vpc-id ${{ env.AWS_VPC_ID }}
+                aws ec2 authorize-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
               env:
                 AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                 AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -49,7 +46,7 @@ jobs:
                 
             - name: Remove Github Actions IP from Security Group
               run: |
-                aws ec2 revoke-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32 --vpc-id ${{ env.AWS_VPC_ID }}
+                aws ec2 revoke-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
               env:
                 AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                 AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
