@@ -17,7 +17,7 @@ jobs:
               run: |
                 echo "AWS_DEFAULT_REGION=ap-northeast-2" >> $GITHUB_ENV
                 echo "AWS_SG_NAME=Resume_AIChatBot_Backend_SG" >> $GITHUB_ENV
-                echo "AWS_VPC_ID=vpc-04d952a98e42dfa35" >> $GITHUB_ENV
+                echo "AWS_VPC_ID=04d952a98e42dfa35" >> $GITHUB_ENV
             
             - name: Configure AWS Credentials
             # You may pin to the exact commit or the version.
