@@ -44,7 +44,7 @@ jobs:
                 script: |
                   cd /home/ubuntu/Flask-Chatbot-API
                   git pull
-                  shutdown -r now
+                  sudo shutdown -r now
                 
             - name: Remove Github Actions IP from Security Group
               run: |
