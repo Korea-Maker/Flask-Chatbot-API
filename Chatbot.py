@@ -148,4 +148,4 @@ def chat():
         return jsonify({"response": "예기치 않은 오류가 발생했습니다."}), 500
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port='5050', debug=True)
+    app.run(host='127.0.0.1', port='5050')
