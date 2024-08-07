@@ -3,6 +3,7 @@ from dotenv import load_dotenv  # 윈도우 사용 시 주석 처리
 import os
 import time
 import re
+import json  # Add import for json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
@@ -110,12 +111,23 @@ def chat():
                 break
 
         if last_message:
-            response_content = re.sub(r'【\d+:\d+†source】', '', last_message.content[0].text.value)  # Assistant의 답변에서 source를 제거
+            try:
+                response_data = last_message.content[0].text.value
+                response_json = json.loads(response_data)  # OpenAI Assistant의 응답이 JSON 형식임을 가정
+                
+                response_content = response_json.get("response", "")
+                suggested_questions = response_json.get("Suggested question", [])
+            except (json.JSONDecodeError, KeyError, TypeError) as e:
+                print(f"JSON parsing error: {e}")
+                response_content = last_message.content[0].text.value
+                suggested_questions = []
+
             data = {
                 "time": datetime.datetime.now(datetime.UTC),
                 "client_ip": client_ip,
                 "question": user_message,
-                "response": response_content
+                "response": response_content,
+                "suggested_questions": suggested_questions
             }
             try:
                 mongo.db.responses.insert_one({
@@ -123,11 +135,12 @@ def chat():
                     "client_ip": data['client_ip'],
                     "user_message": data['question'],
                     "assistant_message": data['response'],
+                    "suggested_questions": data['suggested_questions']
                 })
             except Exception as e:
                 print(f"Mongodb에 응답을 저장하는데 실패했습니다. {e}")
                 return jsonify({"response": "데이터베이스에 응답을 저장하는데 실패했습니다. project5587@gmail.com 로 문의바랍니다."}), 500
-            return jsonify({"response": response_content, "thread_id": thread.id})
+            return jsonify({"response": response_content, "suggested_questions": suggested_questions, "thread_id": thread.id})
         else:
             return jsonify({"response": "Assistant로부터 응답이 없습니다. 잠시후 다시 시도해주세요."}), 500
     except Exception as e:
@@ -135,4 +148,4 @@ def chat():
         return jsonify({"response": "예기치 않은 오류가 발생했습니다."}), 500
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port='5050')
+    app.run(host='127.0.0.1', port='5050', debug=True)
