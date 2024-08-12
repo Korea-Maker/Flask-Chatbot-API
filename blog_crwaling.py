@@ -21,7 +21,7 @@ def mongo_connect():
         db = client[mongo_db]
         collection = db['blogs']
         
-        collection.create_index("link", unique=True)
+        collection.create_index("link", unique=True) # 중복 방지를 위한 인덱스 설정
         return collection
     
     except Exception as e:
