@@ -8,6 +8,11 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 import datetime
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Blogs')))
+
+from Blogs import blogs_bp
 
 # Load .env
 load_dotenv()
@@ -146,6 +151,8 @@ def chat():
     except Exception as e:
         print(f"엔드포인트에서 예기치 않은 오류가 발생했습니다. {e}")
         return jsonify({"response": "예기치 않은 오류가 발생했습니다."}), 500
+    
+app.register_blueprint(blogs_bp)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port='5050')
