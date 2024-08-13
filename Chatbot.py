@@ -10,9 +10,10 @@ from flask_pymongo import PyMongo
 import datetime
 import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Blogs')))
+# Add path to sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Blogs_API')))
 
-from Blogs import blogs_bp
+from Blogs import blogs_bp # Import blogs_bp from Blogs_API
 
 # Load .env
 load_dotenv()
