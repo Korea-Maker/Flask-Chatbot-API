@@ -126,7 +126,11 @@ def chat():
             except (json.JSONDecodeError, KeyError, TypeError) as e:
                 print(f"JSON parsing error: {e}")
                 response_content = last_message.content[0].text.value
-                suggested_questions = []
+                suggested_questions = [
+                    "이종욱에 대해 말해주세요.",
+                    "이종욱의 이력을 알려주세요.",
+                    "이종욱의 성격의 장단점을 알려주세요."
+                ]
 
             data = {
                 "time": datetime.datetime.now(datetime.UTC),
