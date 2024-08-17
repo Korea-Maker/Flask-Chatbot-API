@@ -4,3 +4,4 @@ chatbot_test.py
 /__pycache__/
 Chatbot_fastapi.py
 test_chatbot.py
+start_chatbot.sh
