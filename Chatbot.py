@@ -155,5 +155,6 @@ def chat():
     
 app.register_blueprint(blogs_bp)
 
+# main function to run the Flask app  # Flask app run code goes here
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port='5050')
