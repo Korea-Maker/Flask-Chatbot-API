@@ -23,7 +23,7 @@ mongo_username = os.environ.get('MONGO_USERNAME')
 mongo_password = os.environ.get('MONGO_PASSWORD')
 mongo_host = os.environ.get('MONGO_HOST')
 mongo_port = os.environ.get('MONGO_PORT')
-mongo_db = 'chatbot'
+mongo_db = os.environ.get('MONGO_DB')
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
