@@ -12,8 +12,10 @@ import sys
 
 # Add path to sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Blog_API')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'auth_app')))
 
 from Blogs import blogs_bp # Import blogs_bp from Blogs_API
+from admin_auth import admin_auth_bp  # Import Blueprint from auth_app
 
 # Load .env
 load_dotenv()
@@ -158,6 +160,7 @@ def chat():
         return jsonify({"response": "예기치 않은 오류가 발생했습니다."}), 500
     
 app.register_blueprint(blogs_bp)
+app.register_blueprint(admin_auth_bp, url_prefix='/auth')
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port='5050')
