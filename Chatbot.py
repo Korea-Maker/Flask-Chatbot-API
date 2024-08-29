@@ -120,11 +120,12 @@ def chat():
 
         if last_message:
             try:
-                response_data = last_message.content[0].text.value
-                response_json = json.loads(response_data)  # OpenAI Assistant의 응답이 JSON 형식임을 가정
-                
-                response_content = response_json.get("response", "")
-                suggested_questions = response_json.get("Suggested question", [])
+                json_response_match = re.search(r"\{.*\}", last_message.content[0].text.value, re.DOTALL)
+                if json_response_match:
+                    response_data = json_response_match.group(0)  # Get the JSON part
+                    response_json = json.loads(response_data)  # Parse JSON
+                    response_content = response_json.get("response", "")
+                    suggested_questions = response_json.get("Suggested question", [])
             except (json.JSONDecodeError, KeyError, TypeError) as e:
                 print(f"JSON parsing error: {e}")
                 response_content = last_message.content[0].text.value
