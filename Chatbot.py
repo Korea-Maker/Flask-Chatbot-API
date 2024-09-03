@@ -30,7 +30,7 @@ mongo_db = os.environ.get('MONGO_DB')
 app = Flask(__name__)
 app.config['MONGO_URI'] = f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
 mongo = PyMongo(app)
-CORS(app, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": ["https://resume.jongwook.xyz"]}}, supports_credentials=True)
 
 client = openai.OpenAI(api_key=API_KEY)  # API_KEY를 사용하여 OpenAI 클라이언트를 생성
 
